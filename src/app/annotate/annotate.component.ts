@@ -15,6 +15,8 @@ import Konva from 'konva';
 import { Layer } from 'konva/lib/Layer';
 import { ThrowStmt } from '@angular/compiler';
 import { Line } from 'konva/lib/shapes/Line';
+import { Shape, ShapeConfig } from 'konva/lib/Shape';
+import { RegularPolygonConfig } from 'konva/lib/shapes/RegularPolygon';
 
 export type Point = [number, number];
 
@@ -53,16 +55,22 @@ export class AnnotateComponent implements OnInit, AfterViewInit {
    * Konva layer where user in-progress drawings will be rendered
    */
   @ViewChild('koAnnotateLayer') koAnnotateLayer: CoreShapeComponent;
-
+  //sometimes we have to treat layers programmatically via Konva API:
+  //private koAnnotateLayer: Layer;
 
   /******
    * Completed closed drawings
    */
   private koMasksLayer: Layer;
 
-  //private koAnnotateLayer: Layer;
+
+  private masks: Array<Line> = [];
 
 
+  /***
+   * ko-line tag as a contentChild of #koAnnotateLayer. Some Konva
+   * shape directives still work properly in angular 12....
+   */
   @ViewChild('currentDrawing') currentDrawing: Line;
 
 
@@ -77,6 +85,7 @@ export class AnnotateComponent implements OnInit, AfterViewInit {
   rawImage: HTMLImageElement;
 
 
+
   /******
    * Overall scale factor for the canvas to fit the image in the container
    */
@@ -88,7 +97,8 @@ export class AnnotateComponent implements OnInit, AfterViewInit {
 
     this.handleMouseMove = this.handleMouseMove.bind(this);
     this.handleClick = this.handleClick.bind(this);
-
+    this.onMouseOverVertex = this.onMouseOverVertex.bind(this);
+    this.onMouseOutVertex = this.onMouseOutVertex.bind(this);
 
   }
 
@@ -104,7 +114,6 @@ export class AnnotateComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.selectedImage = this.imagesService.images.find(image => image.id === this.route.snapshot.params['id']) as IImageSource;
-
     this.currentLineShape = this.createLineShape(this.currentShapePoints, this.isFinished);
   }
 
@@ -189,13 +198,12 @@ export class AnnotateComponent implements OnInit, AfterViewInit {
 
 
   private isFinished: boolean = false;
-  private isMouseOverStartPoint: boolean = false;
+  isMouseOverStartPoint: boolean = false;
   private currentShapePoints: number[] = [];//23, 20, 23, 160, 70, 93, 150, 109, 290, 139, 270, 93];
   private currentMousePos: number[] = [0, 0];
 
 
   public currentLineShape: Observable<any>;
-  masks: Array<any>
 
   get flattenedPoints(): number[] {
     if (this.currentShapePoints.length === 0) {
@@ -240,11 +248,15 @@ export class AnnotateComponent implements OnInit, AfterViewInit {
     const mousePos: number[] = this.getMousePos(stage);
     if (this.isMouseOverStartPoint && this.currentShapePoints.length >= 3) {
       this.isFinished = true;
+      this.currentShapePoints = [...this.currentShapePoints, this.currentShapePoints[0], this.currentShapePoints[1]];
+      this.updateLineShape(this.currentDrawingBehavior, this.currentShapePoints, this.isFinished);
+      this.commitLineShape();
     } else {
       this.currentShapePoints = [...this.currentShapePoints, ...mousePos];
+      this.updateLineShape(this.currentDrawingBehavior, this.currentShapePoints, this.isFinished);
+      this.generateAnchorProps(mousePos);
     }
-    this.updateLineShape(this.currentDrawingBehavior, this.currentShapePoints, this.isFinished);
-    this.generateAnchorProps(mousePos);
+
   }
 
   /*****
@@ -273,43 +285,58 @@ export class AnnotateComponent implements OnInit, AfterViewInit {
   }
 
   updateLineShape(observableConfig: BehaviorSubject<any>, pointsArray: number[], isFinished) {
-    const points = [...pointsArray];
     observableConfig.next({
-
+      closed: isFinished,
       fill: '#8bc34a',
       stroke: '#4caf50',
       strokeWidth: 4,
       points: [...this.flattenedPoints],
     });
-
-
   }
 
   commitLineShape() {
     const poly = new Konva.Line({
-      points: this.flattenedPoints,
-      fill: '#8bc34a',
+      points: [...this.flattenedPoints],
+      fill: '#4caf5088',
       stroke: '#4caf50',
       strokeWidth: 4,
       closed: true
     });
     this.koMasksLayer.add(poly);
     this.masks.push(poly);
+
+    this.currentShapePoints = [];
+    this.isFinished = false;
+
   }
 
 
-  public anchorProps: Array<Observable<any>> = [];
+  //public anchorProps: Array<Observable<Partial<RegularPolygonConfig>>> = [];
+  public anchorProps: Array<RegularPolygonConfig> = [];
 
   generateAnchorProps(point: Array<number>) {
-    this.anchorProps.push(of({
+    const anchorProps: RegularPolygonConfig = {
       x: point[0],
       y: point[1],
       radius: 6,
-      fill: '#8bc34a',
+      fill: '#8bc34a77',
       stroke: '#4caf50',
-      strokeWidth: 2,
+      strokeWidth: 1,
       sides: 6
-    }));
+    };
+
+    this.anchorProps.push(anchorProps);
+
+    const anchorPoint: Shape = new Konva.RegularPolygon(anchorProps);
+
+    anchorPoint.on('mouseover', this.onMouseOverVertex);
+    anchorPoint.on('mouseout', this.onMouseOutVertex);
+
+    let stage = this.koAnnotateLayer.getStage();
+    stage.add(anchorPoint);
+
+    console.info('stage', stage)
+
     console.info('anchorprops', this.anchorProps)
   }
 
