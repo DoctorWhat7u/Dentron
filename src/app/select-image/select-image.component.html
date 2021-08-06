@@ -1,0 +1,11 @@
+
+<h2>Select Image</h2>
+  <p>This demo uses satellite imagery of buildings for annotation images.</p>
+  <div class="card-container">
+
+    <a *ngFor="let image of images" class="card" [routerLink]="['/annotate', image.id]">
+
+      <h4>{{image.title}}</h4>
+      <img src={{image.url}}/>
+      </a>
+      </div>

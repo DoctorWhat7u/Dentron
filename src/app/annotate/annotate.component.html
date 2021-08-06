@@ -1,0 +1,17 @@
+<div #containerInner class="container-inner">
+  <h4>{{selectedImage.title}}</h4>
+  <ko-stage [config]="configStage" #koStage
+    (onMouseDown)="handleClick($event)"
+    (onMouseMove)="handleMouseMove($event)">
+
+    <ko-layer #koAnnotateLayer>
+      <ko-line [config]="currentDrawingBehavior" #currentDrawing></ko-line>
+      <!--
+      Tragically unable to get this anchor/control point component to work:
+      -->
+      <ko-regular-polygon *ngFor="let polyConfig of anchorProps" [config]="polyConfig"></ko-regular-polygon>
+    </ko-layer>
+
+
+  </ko-stage>
+</div>
