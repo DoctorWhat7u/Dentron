@@ -1,5 +1,5 @@
 <div #containerInner class="container-inner">
-  <h4>{{selectedImage.title}} isMouseOverStartPoint: {{isMouseOverStartPoint}}</h4>
+  <h4>{{selectedImage.title}}</h4>
   <ko-stage [config]="configStage" #koStage
     (onMouseDown)="handleClick($event)"
     (onMouseMove)="handleMouseMove($event)">
