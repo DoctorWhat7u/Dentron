@@ -1,4 +1,4 @@
-import { Component, ViewChild, OnInit, AfterViewInit, QueryList, ContentChildren, ElementRef } from '@angular/core';
+import { Component, ViewChild, OnInit, AfterViewInit, ElementRef } from '@angular/core';
 import {
   Observable,
   BehaviorSubject,
@@ -6,6 +6,7 @@ import {
   fromEvent,
   combineLatest
 } from "rxjs";
+
 import { map, startWith, pairwise, scan, tap } from "rxjs/operators";
 
 import { ActivatedRoute } from '@angular/router';
@@ -13,13 +14,11 @@ import { IImageSource, ImagesService } from '../../service/images.service';
 import { CoreShapeComponent, KonvaComponent } from 'ng2-konva';
 import Konva from 'konva';
 import { Layer } from 'konva/lib/Layer';
-import { ThrowStmt } from '@angular/compiler';
 import { Line } from 'konva/lib/shapes/Line';
 import { Shape, ShapeConfig } from 'konva/lib/Shape';
 import { RegularPolygonConfig } from 'konva/lib/shapes/RegularPolygon';
 
 export type Point = [number, number];
-
 
 
 @Component({
@@ -31,7 +30,6 @@ export type Point = [number, number];
 export class AnnotateComponent implements OnInit, AfterViewInit {
 
   @ViewChild('containerInner') containerInner: ElementRef;
-
 
 
   /**
@@ -48,7 +46,6 @@ export class AnnotateComponent implements OnInit, AfterViewInit {
    */
   //@ViewChild('koBackgroundLayer') koBackgroundLayer: Layer;
   private koBackgroundLayer: Layer;
-
 
 
   /**
@@ -85,7 +82,6 @@ export class AnnotateComponent implements OnInit, AfterViewInit {
   rawImage: HTMLImageElement;
 
 
-
   /******
    * Overall scale factor for the canvas to fit the image in the container
    */
@@ -99,7 +95,6 @@ export class AnnotateComponent implements OnInit, AfterViewInit {
     this.handleClick = this.handleClick.bind(this);
     this.onMouseOverVertex = this.onMouseOverVertex.bind(this);
     this.onMouseOutVertex = this.onMouseOutVertex.bind(this);
-
   }
 
   //some reasonable defaults to prevent a reflow when we resize
@@ -132,6 +127,8 @@ export class AnnotateComponent implements OnInit, AfterViewInit {
   /**
    * Load the image the user selected and scale the image and stage accordingly.
    * Then set up event handlers.
+   *
+   * @TODO: Refactor sizing around a window resize/breakpoint change event handler.
    */
   ngAfterViewInit(): void {
     this.rawImage = new Image();
@@ -210,10 +207,12 @@ export class AnnotateComponent implements OnInit, AfterViewInit {
       });
   }
 
+
   /**
    * Becomes true when the shape is closed but we havent started another one.
    */
   private isFinished: boolean = false;
+
 
   /**
    * Used to mofify behavior of click events when mouse is over a control ("anchor") point.
@@ -305,7 +304,6 @@ export class AnnotateComponent implements OnInit, AfterViewInit {
 
   /**
    * By clicking on the ko-stage, we start the polygon drawing process.
-
    * @param event
    */
   handleClick = (event) => {
