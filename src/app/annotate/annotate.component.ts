@@ -163,7 +163,6 @@ export class AnnotateComponent implements OnInit, AfterViewInit {
         const imgHeight = img.height();
         const imageRatio = imgWidth / imgHeight;
 
-
         if (aspectRatio >= imageRatio) {
           newWidth = imgWidth;
           newHeight = imgWidth / aspectRatio;
@@ -309,7 +308,7 @@ export class AnnotateComponent implements OnInit, AfterViewInit {
   handleClick = (event) => {
     //stage should never just be a class variable because if we were to create
     //a zoom function, recent experience indicates we have to re-create the entire
-    //stage and its children.
+    //stage and its children
     const stage = this.koStage.getStage();
     const mousePos: number[] = this.getMousePos(stage);
     if (this.isMouseOverStartPoint && this.currentShapePoints.length >= 3) {
@@ -332,7 +331,8 @@ export class AnnotateComponent implements OnInit, AfterViewInit {
 
 
   /**
-   * Creates the initial observable that the polygon can subscribe to
+   * Creates the initial observable that the polygon can subscribe to. This
+   * is the first anchorpoint of a new shape.
    * @param pointsArray
    * @param isFinished
    * @returns {Observable<any>}
@@ -345,8 +345,13 @@ export class AnnotateComponent implements OnInit, AfterViewInit {
       closed: isFinished,
       stroke: '#4caf50',
       strokeWidth: 4
-
     });
+
+
+    //TODO: Send out the point to some OpenCV service to calculate the
+    //center of image countour we are suggesting, then let additional
+    //anchor points fill in and let the user cycle through suggested shapes.
+    // I'm just a web 2.0 guy for now.
     return this.currentDrawingBehavior;
   }
 
