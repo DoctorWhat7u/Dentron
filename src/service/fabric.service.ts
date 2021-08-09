@@ -74,6 +74,7 @@ export class FabricService {
   public clear(): void {
     this.clearActiveControlPoints();
     this.clearActivePolyLines();
+    this.clearMasks();
   }
 
   public initNewActivePolyline(): void {
@@ -81,7 +82,6 @@ export class FabricService {
     this.clearActivePolyLines();
     this._points = new Array<ControlPoint>();
     this._polylines = {};
-    this._masks = {};
   }
 
   public clearActiveControlPoints(): void {
@@ -113,6 +113,17 @@ export class FabricService {
       this._canvas.renderAll();
     }
   }
+
+  protected clearMasks(): void {
+    for (let key in this._masks) {
+      let mask: MaskPolygon = this._masks[key];
+      if (this._canvas) {
+        this._canvas.remove(mask);
+        delete this._masks[key];
+      }
+    }
+  }
+
 
   public addControlPoint(p: Point): void {
 
@@ -159,6 +170,7 @@ export class FabricService {
 
       });
     this.clearActivePolyLines();
+    this._masks[id] = mask;
     this._canvas.add(mask);
   }
 

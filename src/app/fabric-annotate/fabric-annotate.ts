@@ -112,7 +112,6 @@ export class FabricAnnotate implements OnInit, AfterViewInit {
 
 
   private _initFabricCanvas(width, height) {
-    console.info('_initFabricCanvas', width, height);
 
     this._zone.runOutsideAngular(() => {
       this._canvas = new fabric.Canvas('fabricSurface', {
