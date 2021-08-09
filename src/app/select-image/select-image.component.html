@@ -1,11 +1,35 @@
+<div class="mx-auto w-screen h-screen flex flex-col content-center justify-items-center">
+<mat-toolbar>
+  <mat-toolbar-row>
+    <span>Select Image</span>
 
-<h2>Select Image</h2>
-  <p>This demo uses satellite imagery of buildings for annotation images.</p>
-  <div class="card-container">
+    <span class="toolbar-spacer"></span>
 
-    <a *ngFor="let image of images" class="card" [routerLink]="['/annotate', image.id]">
+  </mat-toolbar-row>
+</mat-toolbar>
 
-      <h4>{{image.title}}</h4>
-      <img src={{image.url}}/>
-      </a>
-      </div>
+
+<div #containerInner class="container mx-auto container-inner flex-col flex-grow flex content-center justify-center"  role="main">
+  <h2 class="mat-header pb-2">This demo uses satellite imagery of buildings for annotation images.</h2>
+
+  <div class="grid grid-cols-3 gap-4">
+    <mat-card *ngFor="let image of images" role="group"
+
+      tabindex="0">
+
+      <mat-card-header>
+        <mat-card-title>{{image.title}}</mat-card-title>
+      </mat-card-header>
+
+      <img mat-card-image src={{image.url}}/>
+
+      <mat-card-actions>
+        <span class="ml-6">Annotate with:</span>
+        <a [routerLink]="['/annotate', image.id]" mat-button >Konva</a>
+        <a [routerLink]="['/annotate/fabric', image.id]" mat-button>Fabric</a>
+      </mat-card-actions>
+
+    </mat-card>
+    </div>
+</div>
+</div>

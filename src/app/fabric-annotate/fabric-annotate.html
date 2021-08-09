@@ -1,0 +1,22 @@
+
+
+<div class="mx-auto w-screen h-screen flex flex-col" role="main">
+
+  <mat-toolbar>
+    <mat-toolbar-row>
+      <h1 class="mat-headline">Image Polygon Annotaion with Fabric.js</h1>
+
+      <span class="toolbar-spacer"></span>
+      <mat-icon (click)="onClear()" class="mr24" matTooltip="Clear All Drawings">clear_all</mat-icon>
+      <mat-icon  class="mr24" matTooltip="Graham Scan">border_outer</mat-icon>
+      <mat-icon  class="mr24" matTooltip="Melkman's Algorithm">border_all</mat-icon>
+
+    </mat-toolbar-row>
+  </mat-toolbar>
+
+  <div #containerInner class="container-inner flex flex-0 content-center items-center justify-center ">
+
+        <canvas id="fabricSurface" height="500" width="500"></canvas>
+      <!-- <div class="flex min-w-full min-h-full  max-w-full max-h-full"></div> -->
+  </div>
+</div>

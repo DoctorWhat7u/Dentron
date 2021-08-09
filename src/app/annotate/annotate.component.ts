@@ -104,7 +104,7 @@ export class AnnotateComponent implements OnInit, AfterViewInit {
 
 
   /****
-   * It turned out, that in angular 12 the ability to subscribe to
+   * It turned out, that in angular 12 Konva's ability to subscribe to
    * observable updates without corrupting internal references to the canvas
    * is botched for the main Stage object. Though its an of here, we later
    * have to set width and height directly.
